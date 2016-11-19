@@ -29,9 +29,6 @@ int fopen_s(FILE **f, const char *name, const char *mode) {
 
 /* constants */
 namespace {
-	const double e = 1;
-	const double kB = 8.31e-3;
-	const double hsharp = 1;
 	const double PI = 3.141592653589793;
 }
 
@@ -48,7 +45,7 @@ Parameters getParameters(std::string inputFileName)
 		           >> param.Sout
 		           >> param.Stot
 				   >> param.n;
-		param.dx = 1 / param.N;
+		param.dx = 1 / static_cast<double>(param.N);
 
     return param;
 }
@@ -61,7 +58,7 @@ void setInitialState(const Parameters &parameters, State &state)
 
 void setInitialFi(const Parameters &parameters, vector<Complex> & fi)
 {
-	fi.resize(parameters.N + 1);
+
     for(int k = 0; k < (parameters.N + 1); k++)
     {
 		double xk = k * parameters.dx;
@@ -72,7 +69,7 @@ void setInitialFi(const Parameters &parameters, vector<Complex> & fi)
 
 void setHamiltonian(const Parameters &parameters, State & state, double &t)
 {
-	state.H.resize(parameters.N + 1);
+
 	state.H[0].re = 0;
 	state.H[0].im = 0;
 	state.H[parameters.N].re = 0;
@@ -81,13 +78,11 @@ void setHamiltonian(const Parameters &parameters, State & state, double &t)
 	for (int k = 1; k < parameters.N; k++)
 	{
 		xk += parameters.dx;
-		state.H[k].re = {-0.5 * (state.fi[k+1].re + state.fi[k].re - 2 * state.fi[k-1].re) / (parameters.dx  *parameters.dx)
+		state.H[k].re = {-0.5 * (state.fi[k+1].re + state.fi[k].re - 2 * state.fi[k-1].re) / (parameters.dx  * parameters.dx)
 						+ parameters.kappa * (xk - .5) * state.fi[k].re * sin(parameters.omega * t)};
-		state.H[k].im = { -0.5 * (state.fi[k + 1].im + state.fi[k].im - 2 * state.fi[k - 1].im) / (parameters.dx  *parameters.dx)
+		state.H[k].im = { -0.5 * (state.fi[k + 1].im + state.fi[k].im - 2 * state.fi[k - 1].im) / (parameters.dx  * parameters.dx)
 			            + parameters.kappa * (xk - .5) * state.fi[k].im * sin(parameters.omega * t) };
 	}
-
-	
 }
 
 
@@ -98,15 +93,16 @@ void simulate(const Parameters &parameters, State &state, ofstream & outputFileC
     {
         updateState(parameters, state);
 
-        if(!(s % parameters.Sout))
-            outputState(state, outputFileChar, state.t);
+		if (!(s % parameters.Sout))
+		{
+			setStateParameters(parameters, state);
+			outputState(state, outputFileChar);
+		}
     }
-
 }
 
 void updateState(const Parameters &parameters, State &state)
 {
-	
 	for (int k = 0; k < (parameters.N + 1); k++)
     {
 		state.fi[k].re = state.fi[k].re + .5 * state.H[k].im * parameters.dtau;
@@ -125,10 +121,9 @@ void updateState(const Parameters &parameters, State &state)
 	{
 		state.fi[k].re = state.fi[k].re + .5 * state.H[k].im * parameters.dtau;
 	}
-
 }
 
-void setEnergyAndTemperature(const Parameters &parameters, State &state)
+void setStateParameters(const Parameters &parameters, State &state)
 {
 	state.N = 0;
 	state.x = 0;
@@ -145,13 +140,11 @@ void setEnergyAndTemperature(const Parameters &parameters, State &state)
 	state.N *= parameters.dx;
 	state.x *= parameters.dx;
 	state.E *= parameters.dx;
-
-	//TODO: output ro 
 }
 
 
-void outputState(State & state, ofstream &outputFile, double &t)
+void outputState(State & state, ofstream &outputFile)
 {
-    outputFile << t << "\t" << state.N << "\t" << state.x << "\t" << state.E << "\t" << state.t << endl;
+    outputFile << state.t << "\t" << state.N << "\t" << state.x << "\t" << state.E << "\t" << endl;
 }
 

@@ -23,7 +23,7 @@ struct Complex
 
 struct Parameters
 {
-    double N;
+    int N;
 	double kappa;
 	double omega;
 	double dtau;
@@ -53,9 +53,9 @@ void setHamiltonian(const Parameters &parameters, State & state, double &t);
 void simulate(const Parameters &Parameters, State &state, std::ofstream &outputFileState);
 
 void updateState(const Parameters &Parameters, State & state);
-void setEnergyAndTemperature(const Parameters &Parameters, State & state);
+void setStateParameters(const Parameters &Parameters, State & state);
 
-void outputState(State &state, std::ofstream &outputFile, double &t);
+void outputState(State &state, std::ofstream &outputFile);
 
 #endif 
 

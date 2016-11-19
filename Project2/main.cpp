@@ -7,14 +7,16 @@
 
 #include "simulation.h"
 #include "coor.h"
-#include "main.h"
 
 int main(int /* argc */, char* /* argv */[])
 {
-
+	Parameters parameters = getParameters("data.txt");
+	
 	State state = {};
-    Parameters parameters = getParameters("data.txt");
 
+	state.H.resize(parameters.N + 1);
+	state.ro.resize(parameters.N + 1);
+	state.fi.resize(parameters.N + 1);
 	setInitialState(parameters, state);
 
 	std::ofstream outputFile;
