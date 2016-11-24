@@ -46,6 +46,7 @@ Parameters getParameters(std::string inputFileName)
 		           >> param.Stot
 				   >> param.n;
 		param.dx = 1 / static_cast<double>(param.N);
+		param.omega = param.omega * PI * PI;
 
     return param;
 }
@@ -78,9 +79,9 @@ void setHamiltonian(const Parameters &parameters, State & state, double &t)
 	for (int k = 1; k < parameters.N; k++)
 	{
 		xk += parameters.dx;
-		state.H[k].re = {-0.5 * (state.fi[k+1].re + state.fi[k].re - 2 * state.fi[k-1].re) / (parameters.dx  * parameters.dx)
+		state.H[k].re = {-0.5 * (state.fi[k+1].re + state.fi[k - 1].re - 2 * state.fi[k].re) / (parameters.dx  * parameters.dx)
 						+ parameters.kappa * (xk - .5) * state.fi[k].re * sin(parameters.omega * t)};
-		state.H[k].im = { -0.5 * (state.fi[k + 1].im + state.fi[k].im - 2 * state.fi[k - 1].im) / (parameters.dx  * parameters.dx)
+		state.H[k].im = { -0.5 * (state.fi[k + 1].im + state.fi[k - 1].im - 2 * state.fi[k].im) / (parameters.dx  * parameters.dx)
 			            + parameters.kappa * (xk - .5) * state.fi[k].im * sin(parameters.omega * t) };
 	}
 }
@@ -112,7 +113,7 @@ void updateState(const Parameters &parameters, State &state)
 
 	for (int k = 0; k < (parameters.N + 1); k++)
 	{
-		state.fi[k].im = state.fi[k].im + .5 * state.H[k].re * parameters.dtau;
+		state.fi[k].im = state.fi[k].im  -  state.H[k].re * parameters.dtau;
 	}
 	state.t += parameters.dtau;
 	setHamiltonian(parameters, state, state.t);
