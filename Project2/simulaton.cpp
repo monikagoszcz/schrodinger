@@ -6,12 +6,12 @@
  */
 
 #include "simulation.h"
-#include "Coor.h"
 
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <algorithm>
 
 using namespace std;
 
@@ -147,5 +147,69 @@ void setStateParameters(const Parameters &parameters, State &state)
 void outputState(State & state, ofstream &outputFile)
 {
     outputFile << state.t << "\t" << state.N << "\t" << state.x << "\t" << state.E << "\t" << endl;
+}
+
+void outputMaxEnergy(ResonantParameters &res, ofstream &outputFileResonance)
+{
+	for (int i = 0; i < res.omega.size() - 1; i++)
+	{
+		outputFileResonance << res.omega[i] << "\t" << res.maxEnergy[i] << endl;
+	}
+
+}
+
+void findResonanceCurve(Parameters &Parameters, State &state, ofstream &outputFileResonance) 
+{
+	ResonantParameters  res = {};
+	int N = 30;
+	res.omega.resize(N+1);
+	res.maxEnergy.resize(N);
+	double omegaBegin = 0.5 * Parameters.omega;
+	double omegaEnd = 1.25 * Parameters.omega;
+	double step = (omegaEnd - omegaBegin) / static_cast<double>(N);
+
+	res.omega[0] = omegaBegin;
+
+	for (int i = 0; i < N; i++)
+	{
+		string name = "output" + to_string(i) + ".txt";
+		ofstream outputFile;
+		outputFile.open(name);
+		vector<double> Energies = {};
+		Parameters.omega = res.omega[i];
+		simulate(Parameters, state, Energies, outputFile);
+		res.maxEnergy[i] = maxValue(Energies);
+		res.omega[i + 1] = res.omega[i] + step;
+	}
+	outputMaxEnergy(res, outputFileResonance);
+	
+}
+
+void simulate(const Parameters &Parameters, State &state, vector<double> & Energies, ofstream & outputFileChar)
+{
+
+	state.t = 0;
+	for (int s = 1; s <= (Parameters.Stot); s++)
+	{
+		updateState(Parameters, state);
+
+		if (!(s % Parameters.Sout))
+		{
+			setStateParameters(Parameters, state);
+			Energies.push_back(state.E);
+			outputState(state, outputFileChar);
+		}
+	}
+}
+
+double maxValue(vector<double> & vect)
+{
+	double max = vect[0];
+	for (int i = 1; i < vect.size(); i++)
+	{
+		if (max < vect[i])
+			max = vect[i];
+	}
+	return max;
 }
 

@@ -13,12 +13,16 @@
 #include <string>
 #include <vector>
 
-#include "coor.h"
-
 struct Complex
 {
 	double re;
 	double im;
+};
+
+struct ResonantParameters
+{
+	std::vector<double> omega;
+	std::vector<double> maxEnergy;
 };
 
 struct Parameters
@@ -56,6 +60,12 @@ void updateState(const Parameters &Parameters, State & state);
 void setStateParameters(const Parameters &Parameters, State & state);
 
 void outputState(State &state, std::ofstream &outputFile);
+void outputMaxEnergy(ResonantParameters &res, std::ofstream &outputFileResonance);
+
+void findResonanceCurve(Parameters &Parameters, State &state, std::ofstream &outputFileResonance);
+void simulate(const Parameters &Parameters, State &state, std::vector<double> & Energies, std::ofstream & outputFileChar);
+double maxValue(std::vector<double> & vect);
+
 
 #endif 
 

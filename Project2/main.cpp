@@ -24,6 +24,12 @@ int main(int /* argc */, char* /* argv */[])
 
     simulate(parameters, state, outputFile);
 
+	std::ofstream outputResonanceFile;
+	outputResonanceFile.open("outputR.txt");
+
+	findResonanceCurve(parameters, state, outputResonanceFile);
+
+
     return 0;
 }
 
