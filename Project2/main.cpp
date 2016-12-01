@@ -6,11 +6,11 @@
  */
 
 #include "simulation.h"
-#include "coor.h"
 
-int main(int /* argc */, char* /* argv */[])
+int main(int argc, char*  argv[])
 {
-	Parameters parameters = getParameters("data.txt");
+	std::string number = argv[1];
+	Parameters parameters = getParameters("data"+ number + ".txt");
 	
 	State state = {};
 
@@ -20,15 +20,12 @@ int main(int /* argc */, char* /* argv */[])
 	setInitialState(parameters, state);
 
 	std::ofstream outputFile;
-    outputFile.open("output.txt");
-
-    simulate(parameters, state, outputFile);
+    outputFile.open("output" + number +".txt");
 
 	std::ofstream outputResonanceFile;
-	outputResonanceFile.open("outputR.txt");
+	outputResonanceFile.open("outputR" + number + ".txt");
 
-	findResonanceCurve(parameters, state, outputResonanceFile);
-
+    simulate(parameters, state, outputFile, outputResonanceFile);
 
     return 0;
 }

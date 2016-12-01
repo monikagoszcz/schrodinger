@@ -19,12 +19,6 @@ struct Complex
 	double im;
 };
 
-struct ResonantParameters
-{
-	std::vector<double> omega;
-	std::vector<double> maxEnergy;
-};
-
 struct Parameters
 {
     int N;
@@ -54,18 +48,12 @@ void setInitialState(const Parameters &Parameters, State & state);
 void setInitialFi(const Parameters &parameters, std::vector<Complex> & fi);
 void setHamiltonian(const Parameters &parameters, State & state, double &t);
 
-void simulate(const Parameters &Parameters, State &state, std::ofstream &outputFileState);
+void simulate(const Parameters &Parameters, State &state, std::ofstream &outputFileState, std::ofstream &outputFileEmax);
 
 void updateState(const Parameters &Parameters, State & state);
 void setStateParameters(const Parameters &Parameters, State & state);
 
 void outputState(State &state, std::ofstream &outputFile);
-void outputMaxEnergy(ResonantParameters &res, std::ofstream &outputFileResonance);
-
-void findResonanceCurve(Parameters &Parameters, State &state, std::ofstream &outputFileResonance);
-void simulate(const Parameters &Parameters, State &state, std::vector<double> & Energies, std::ofstream & outputFileChar);
-double maxValue(std::vector<double> & vect);
-
 
 #endif 
 
